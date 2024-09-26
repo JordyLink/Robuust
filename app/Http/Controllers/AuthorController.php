@@ -13,15 +13,11 @@ class AuthorController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        // get all the authors max 25
+        // route for second page: /api/author?page=2
+        $authors = Author::paginate(20);
+        // return the authors
+        return response()->json($authors);
     }
 
     /**
@@ -29,7 +25,28 @@ class AuthorController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            // validate the input 
+            $request->validate([
+                'name' => 'required|string|max:255'
+            ]);
+
+            // create a author object
+            $author = new Author;
+            // set the name for the author
+            $author->name = $request->name;
+            // save the author object to the database
+            $author->save();
+
+            // return the author
+            return response()->json($author);
+        } catch (\Throwable $th) {
+            // if something went wrong send a message back
+            return response()->json([
+                "message" => "Something went wrong",
+            ]);
+            
+        }
     }
 
     /**
@@ -37,15 +54,8 @@ class AuthorController extends Controller
      */
     public function show(Author $author)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Author $author)
-    {
-        //
+        // return the author
+        return response()->json($author);
     }
 
     /**
@@ -53,7 +63,27 @@ class AuthorController extends Controller
      */
     public function update(Request $request, Author $author)
     {
-        //
+        try {
+            // validate the input 
+            $request->validate([
+                'name' => 'required|string|max:255'
+            ]);
+
+            // change the name of the author
+            $author->name = $request->name;
+            // save the changes in the database
+            $author->save();
+
+            // return the author 
+            return response()->json($author);
+        } catch (\Throwable $th) {
+            // if something went wrong send a message back
+            return response()->json([
+                "message" => "Something went wrong",
+            ]);
+            
+        }
+        
     }
 
     /**
@@ -61,6 +91,20 @@ class AuthorController extends Controller
      */
     public function destroy(Author $author)
     {
-        //
+        try {
+            // delete the author from the database
+            $author->delete();
+            // return a message that the author is deleted
+            return response()->json([
+                "message" => "Author deleted succesfully!"
+            ]);
+        } catch (\Throwable $th) {
+            // if something went wrong send a message back
+            return response()->json([
+                "message" => "Something went wrong",
+            ]);
+            
+        }
+
     }
 }
