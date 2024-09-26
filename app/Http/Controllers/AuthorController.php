@@ -15,7 +15,7 @@ class AuthorController extends Controller
     {
         // get all the authors max 25
         // route for second page: /api/author?page=2
-        $authors = Author::paginate(20);
+        $authors = Author::paginate(25);
         // return the authors
         return response()->json($authors);
     }
@@ -56,6 +56,11 @@ class AuthorController extends Controller
     {
         // return the author
         return response()->json($author);
+    }
+
+    public function authorExistsById($id)
+    {
+        return Author::find($id) ? true : false;
     }
 
     /**

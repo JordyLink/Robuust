@@ -10,4 +10,5 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 // create for all rescources a route: CRUD 
+Route::apiResource('blog', BlogController::class);
 Route::apiResource('author', AuthorController::class);

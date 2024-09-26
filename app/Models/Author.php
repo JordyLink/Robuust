@@ -10,6 +10,15 @@ class Author extends Model
     use HasFactory;
 
     /**
+     * fillable columns
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+    ];
+
+    /**
      * Get the blogs.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
