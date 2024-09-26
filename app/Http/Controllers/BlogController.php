@@ -13,37 +13,45 @@ class BlogController extends Controller
      */
     public function index(Request $request)
     {
-        $blogs = Blog::with('author');
-        // check if the request has a value called created_at and if the value is filled
-        // route for created_at /api/blog?created_at=2024-9-26
-        if ($request->has('created_at') && $request->created_at != null) {
-            // filter the blogs by the created_at date
-            $blogs->whereDate('created_at', $request->created_at);
+        try {
+            $blogs = Blog::with('author');
+            // check if the request has a value called created_at and if the value is filled
+            // route for created_at /api/blog?created_at=2024-9-26
+            if ($request->has('created_at') && $request->created_at != null) {
+                // filter the blogs by the created_at date
+                $blogs->whereDate('created_at', $request->created_at);
+            }
+
+            // check if the request has a value called author_id and if the value is filled
+            // route for author_id /api/blog?author_id=2024-9-26
+            if ($request->has('author_id') && $request->author_id != null) {
+                // filter the blogs by the author
+                $blogs->where('author_id', $request->author_id);
+            }
+
+            // get all the blogs max 25
+            // route for second page: /api/blog?page=2
+            $blogs = $blogs->paginate(25);
+
+            // get the amount of created blogs per month in the last 12 months
+            $blogs_per_month = Blog::selectRaw('MONTHNAME(created_at) as month, COUNT(*) as count')
+                ->where('created_at', '>=', now()->subMonths(12))
+                ->groupBy('month')
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            // return the blogs & the blogs per month
+            return response()->json([
+                'blogs' => $blogs,
+                'blogs_per_month' => $blogs_per_month
+            ]);
+        } catch (\Throwable $th) {
+            // if something went wrong send a message back
+            return response()->json([
+                "message" => "Something went wrong",
+            ]);
+            
         }
-
-        // check if the request has a value called author_id and if the value is filled
-        // route for author_id /api/blog?author_id=2024-9-26
-        if ($request->has('author_id') && $request->author_id != null) {
-            // filter the blogs by the author
-            $blogs->where('author_id', $request->author_id);
-        }
-
-        // get all the blogs max 25
-        // route for second page: /api/blog?page=2
-        $blogs = $blogs->paginate(25);
-
-        // get the amount of created blogs per month in the last 12 months
-        $blogs_per_month = Blog::selectRaw('MONTHNAME(created_at) as month, COUNT(*) as count')
-            ->where('created_at', '>=', now()->subMonths(12))
-            ->groupBy('month')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // return the blogs & the blogs per month
-        return response()->json([
-            'blogs' => $blogs,
-            'blogs_per_month' => $blogs_per_month
-        ]);
     }
 
     /**
